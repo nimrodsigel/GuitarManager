@@ -1,0 +1,17 @@
+{
+  "name": "guitar-manager",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node --experimental-sqlite server/index.js",
+    "client": "npm run dev --prefix client",
+    "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+    "start": "node --experimental-sqlite server/index.js"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

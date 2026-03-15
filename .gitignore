@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Database (local data — don't commit)
+server/guitars.db
+server/guitars.db-shm
+server/guitars.db-wal
+
+# Uploaded photos (local files — don't commit)
+server/uploads/
+
+# Build output
+client/dist/
+
+# Env files
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
