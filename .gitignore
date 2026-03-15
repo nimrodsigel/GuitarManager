@@ -14,6 +14,9 @@ server/uploads/
 # Build output
 client/dist/
 
+# Client lock file — regenerated per-platform on Railway
+client/package-lock.json
+
 # Env files
 .env
 .env.local
