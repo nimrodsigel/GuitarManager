@@ -9,9 +9,21 @@ const db = new DatabaseSync(path.join(dataDir, 'guitars.db'));
 db.exec(`PRAGMA journal_mode = WAL`);
 db.exec(`PRAGMA foreign_keys = ON`);
 
+// ─── Users ────────────────────────────────────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    created_at TEXT DEFAULT (datetime('now'))
+  )
+`);
+
+// ─── Guitars ──────────────────────────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS guitars (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     make TEXT NOT NULL,
     model TEXT NOT NULL,
     year INTEGER,
@@ -26,7 +38,9 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now'))
   )
 `);
+try { db.exec(`ALTER TABLE guitars ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE CASCADE`); } catch(_) {}
 
+// ─── Photos ───────────────────────────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS photos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,9 +51,11 @@ db.exec(`
   )
 `);
 
+// ─── Wishlist ─────────────────────────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS wishlist (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     make TEXT,
     model TEXT,
     year_from INTEGER,
@@ -50,17 +66,22 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now'))
   )
 `);
+try { db.exec(`ALTER TABLE wishlist ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE CASCADE`); } catch(_) {}
 
+// ─── Share tokens ─────────────────────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS share_tokens (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     token TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now'))
   )
 `);
+try { db.exec(`ALTER TABLE share_tokens ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE CASCADE`); } catch(_) {}
 
+// ─── Offers ───────────────────────────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS offers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

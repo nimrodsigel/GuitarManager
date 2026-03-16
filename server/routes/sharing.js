@@ -21,8 +21,7 @@ function validateToken(req, res, next) {
 
 // GET /api/shares
 router.get('/shares', (req, res) => {
-  const shares = db.prepare('SELECT * FROM share_tokens ORDER BY created_at DESC').all();
-  res.json(shares);
+  res.json(db.prepare('SELECT * FROM share_tokens WHERE user_id = ? ORDER BY created_at DESC').all(req.userId));
 });
 
 // POST /api/shares
@@ -30,13 +29,13 @@ router.post('/shares', (req, res) => {
   const { name } = req.body;
   if (!name) return res.status(400).json({ error: 'Name is required' });
   const token = crypto.randomUUID();
-  const result = db.prepare('INSERT INTO share_tokens (token, name) VALUES (?, ?)').run(token, name);
+  const result = db.prepare('INSERT INTO share_tokens (user_id, token, name) VALUES (?, ?, ?)').run(req.userId, token, name);
   res.status(201).json(db.prepare('SELECT * FROM share_tokens WHERE id = ?').get(result.lastInsertRowid));
 });
 
 // PATCH /api/shares/:id/revoke
 router.patch('/shares/:id/revoke', (req, res) => {
-  db.prepare('UPDATE share_tokens SET active = 0 WHERE id = ?').run(req.params.id);
+  db.prepare('UPDATE share_tokens SET active = 0 WHERE id = ? AND user_id = ?').run(req.params.id, req.userId);
   res.json({ ok: true });
 });
 
@@ -47,26 +46,26 @@ router.get('/offers', (req, res) => {
   const { status } = req.query;
   let query = `
     SELECT o.*, g.make, g.model, g.year, g.category,
-           p.filename as cover_photo,
-           s.name as share_name
+           p.filename as cover_photo, s.name as share_name
     FROM offers o
     JOIN guitars g ON g.id = o.guitar_id
     LEFT JOIN photos p ON p.guitar_id = g.id AND p.is_cover = 1
     JOIN share_tokens s ON s.id = o.token_id
-    WHERE 1=1
+    WHERE g.user_id = ?
   `;
-  const params = [];
-  if (status && status !== 'all') {
-    query += ' AND o.status = ?';
-    params.push(status);
-  }
+  const params = [req.userId];
+  if (status && status !== 'all') { query += ' AND o.status = ?'; params.push(status); }
   query += ' ORDER BY o.created_at DESC';
   res.json(db.prepare(query).all(...params));
 });
 
 // GET /api/offers/count  — pending count for badge
 router.get('/offers/count', (req, res) => {
-  const row = db.prepare("SELECT COUNT(*) as count FROM offers WHERE status = 'pending'").get();
+  const row = db.prepare(`
+    SELECT COUNT(*) as count FROM offers o
+    JOIN guitars g ON g.id = o.guitar_id
+    WHERE g.user_id = ? AND o.status = 'pending'
+  `).get(req.userId);
   res.json({ count: row.count });
 });
 
@@ -85,30 +84,27 @@ router.patch('/offers/:id', (req, res) => {
 // GET /api/shared/:token  — validate + list in-stock guitars (no prices)
 router.get('/shared/:token', validateToken, (req, res) => {
   const { category } = req.query;
+  const ownerId = req.shareToken.user_id;
   let query = `
     SELECT g.id, g.make, g.model, g.year, g.serial_number, g.category,
            g.condition, g.status, g.comments, g.created_at,
            p.filename as cover_photo
     FROM guitars g
     LEFT JOIN photos p ON p.guitar_id = g.id AND p.is_cover = 1
-    WHERE g.status = 'in_stock'
+    WHERE g.status = 'in_stock' AND g.user_id = ?
   `;
-  const params = [];
-  if (category && category !== 'all') {
-    query += ' AND g.category = ?';
-    params.push(category);
-  }
+  const params = [ownerId];
+  if (category && category !== 'all') { query += ' AND g.category = ?'; params.push(category); }
   query += ' ORDER BY g.created_at DESC';
-  const guitars = db.prepare(query).all(...params);
-  res.json({ share: { name: req.shareToken.name }, guitars });
+  res.json({ share: { name: req.shareToken.name }, guitars: db.prepare(query).all(...params) });
 });
 
 // GET /api/shared/:token/guitars/:id
 router.get('/shared/:token/guitars/:id', validateToken, (req, res) => {
   const guitar = db.prepare(`
     SELECT id, make, model, year, serial_number, category, condition, status, comments, created_at
-    FROM guitars WHERE id = ? AND status = 'in_stock'
-  `).get(req.params.id);
+    FROM guitars WHERE id = ? AND status = 'in_stock' AND user_id = ?
+  `).get(req.params.id, req.shareToken.user_id);
   if (!guitar) return res.status(404).json({ error: 'Not found' });
   const photos = db.prepare('SELECT * FROM photos WHERE guitar_id = ? ORDER BY is_cover DESC, created_at ASC').all(req.params.id);
   res.json({ ...guitar, photos });

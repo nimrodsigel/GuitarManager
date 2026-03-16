@@ -1,6 +1,7 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getPendingOffersCount } from '../api';
+import { useAuth } from '../context/AuthContext';
 
 const links = [
   { to: '/', label: 'Dashboard' },
@@ -13,6 +14,8 @@ const links = [
 export default function Navbar() {
   const [pendingCount, setPendingCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = () => getPendingOffersCount().then(d => setPendingCount(d.count || 0));
@@ -20,6 +23,8 @@ export default function Navbar() {
     const interval = setInterval(load, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
     <nav className="bg-[#1e3a5f] text-white shadow-lg">
@@ -47,6 +52,14 @@ export default function Navbar() {
               )}
             </NavLink>
           ))}
+          {user && (
+            <div className="flex items-center gap-2 ml-2 pl-2 border-l border-[#2a4f7a]">
+              <span className="text-xs text-gray-400">{user.name}</span>
+              <button onClick={handleLogout} className="text-xs text-gray-400 hover:text-white transition-colors">
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Mobile hamburger */}
