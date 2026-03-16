@@ -20,8 +20,8 @@ function exportToCSV(guitars) {
   a.click(); URL.revokeObjectURL(url);
 }
 
-const CATEGORIES = ['all', 'electric', 'acoustic', 'pedal', 'amp', 'misc'];
-const CAT_LABELS = { all: 'All', electric: '⚡ Electric', acoustic: '🎸 Acoustic', pedal: '🎛️ Pedals', amp: '🔊 Amps', misc: '🎵 Misc' };
+const CATEGORIES = ['all', 'electric', 'acoustic', 'bass', 'pedal', 'amp', 'misc'];
+const CAT_LABELS = { all: 'All', electric: '⚡ Electric', acoustic: '🎸 Acoustic', bass: '🎸 Bass', pedal: '🎛️ Pedals', amp: '🔊 Amps', misc: '🎵 Misc' };
 
 export default function Collection() {
   const [guitars, setGuitars] = useState([]);

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getSummary } from '../api';
 import GuitarCard from '../components/GuitarCard';
 
-const CATEGORY_ICONS = { electric: '⚡', acoustic: '🎸', pedal: '🎛️', amp: '🔊', misc: '🎵' };
+const CATEGORY_ICONS = { electric: '⚡', acoustic: '🎸', bass: '🎸', pedal: '🎛️', amp: '🔊', misc: '🎵' };
 
 function StatCard({ label, value, sub, color }) {
   return (
@@ -37,8 +37,8 @@ export default function Dashboard() {
       </div>
 
       <h2 className="font-semibold text-gray-700 mb-3">By Category</h2>
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-8">
-        {['electric','acoustic','pedal','amp','misc'].map(cat => {
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-8">
+        {['electric','acoustic','bass','pedal','amp','misc'].map(cat => {
           const entry = data.byCategory.find(b => b.category === cat);
           return (
             <button key={cat} onClick={() => navigate(`/collection?category=${cat}`)}

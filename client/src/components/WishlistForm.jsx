@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const CATEGORIES = ['electric', 'acoustic', 'pedal', 'amp', 'misc'];
+const CATEGORIES = ['electric', 'acoustic', 'bass', 'pedal', 'amp', 'misc'];
 const EMPTY = { make: '', model: '', year_from: '', year_to: '', max_price: '', category: 'electric', notes: '' };
 
 export default function WishlistForm({ initial, onSave, onCancel }) {

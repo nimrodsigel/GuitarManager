@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const CATEGORIES = ['electric', 'acoustic', 'pedal', 'amp', 'misc'];
+const CATEGORIES = ['electric', 'acoustic', 'bass', 'pedal', 'amp', 'misc'];
 const CONDITIONS = ['Mint', 'Excellent', 'Good', 'Fair', 'Poor'];
 const STATUSES = ['in_stock', 'sold', 'consignment'];
 const STATUS_LABELS = { in_stock: 'In Stock', sold: 'Sold', consignment: 'Consignment' };

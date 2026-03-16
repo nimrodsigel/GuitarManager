@@ -6,7 +6,7 @@ const STATUS_COLORS = {
   consignment: 'bg-blue-100 text-blue-800',
 };
 const STATUS_LABELS = { in_stock: 'In Stock', sold: 'Sold', consignment: 'Consignment' };
-const CATEGORY_ICONS = { electric: '⚡', acoustic: '🎸', pedal: '🎛️', amp: '🔊', misc: '🎵' };
+const CATEGORY_ICONS = { electric: '⚡', acoustic: '🎸', bass: '🎸', pedal: '🎛️', amp: '🔊', misc: '🎵' };
 
 export default function GuitarCard({ guitar }) {
   const navigate = useNavigate();
