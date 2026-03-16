@@ -63,6 +63,17 @@ export default function About() {
         ))}
       </div>
 
+      {/* Disclaimer */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
+        <h2 className="text-sm font-bold text-amber-800 mb-2">⚠️ Disclaimer</h2>
+        <div className="text-xs text-amber-700 space-y-1.5 leading-relaxed">
+          <p><strong>Personal Use Only.</strong> Guitar Manager is intended solely for personal, non-commercial use.</p>
+          <p><strong>No Liability.</strong> The developers are not responsible for any loss, damage, or disputes arising from the use of this application, including inaccurate valuations, lost data, or transactions between users.</p>
+          <p><strong>Your Responsibility.</strong> You are solely responsible for the accuracy of information entered and any transactions made with other users.</p>
+          <p><strong>No Warranty.</strong> This app is provided "as is" without any guarantees of availability or accuracy.</p>
+        </div>
+      </div>
+
       {/* Version info + contact */}
       <div className="bg-[#1e3a5f] text-white rounded-xl p-5 text-center">
         <p className="text-[#c9a84c] font-bold text-lg">Guitar Manager</p>

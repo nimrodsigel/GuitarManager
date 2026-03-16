@@ -5,6 +5,21 @@ import GuitarCard from '../components/GuitarCard';
 import GuitarForm from '../components/GuitarForm';
 import ShareModal from '../components/ShareModal';
 
+function exportToCSV(guitars) {
+  const headers = ['Make','Model','Year','Category','Condition','Status','Serial Number','Price Bought','Year Bought','Price Sold','Comments'];
+  const rows = guitars.map(g => [
+    g.make, g.model, g.year || '', g.category, g.condition || '', g.status,
+    g.serial_number || '', g.price_bought || '', g.year_bought || '',
+    g.price_sold || '', (g.comments || '').replace(/\n/g, ' ')
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `guitar-collection-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
 const CATEGORIES = ['all', 'electric', 'acoustic', 'pedal', 'amp', 'misc'];
 const CAT_LABELS = { all: 'All', electric: '⚡ Electric', acoustic: '🎸 Acoustic', pedal: '🎛️ Pedals', amp: '🔊 Amps', misc: '🎵 Misc' };
 
@@ -41,6 +56,10 @@ export default function Collection() {
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-gray-900">Collection</h1>
         <div className="flex gap-2">
+          <button onClick={() => exportToCSV(guitars)} title="Export to CSV"
+            className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold px-3 py-2 rounded-lg transition-colors text-sm flex items-center gap-1.5">
+            📥 Export
+          </button>
           <button onClick={() => setShowShare(true)}
             className="bg-[#2a4f7a] hover:bg-[#335e8e] text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-1.5">
             🔗 Share
